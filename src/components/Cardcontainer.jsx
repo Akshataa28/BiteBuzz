@@ -3,12 +3,15 @@ import RestaurantCard from './RestaurantCard'
 import{useState, useEffect} from 'react'
 import {API_URL } from '../constants/config'
 import ShimmerCard from './ShimmerCard'
-import Footer from './Footer'
+import useRestaurant from '../utils/useRestaurant'
 
 const Cardcontainer = () => {
 const [restaurantList, setRestaurantList]=useState([])
+const [masterList, setMasterList]=useState([])
 const [searchText,setSearchText]=useState("");
 const [errorMessage,setErrorMessage]=useState("")
+const restaurantData= useRestaurant();
+console.log("restaurantList from custom hook",restaurantData)
   // [;
   //   {
   //     name:"Pizza Hut",
@@ -66,7 +69,6 @@ const handlesearchText=(val)=>
   setSearchText(val)
 }
 
-
   const handleRating=()=>
   {
     const filteredData=restaurantList.filter((restuarant)=>{
@@ -78,9 +80,10 @@ setRestaurantList(filteredData)
   }
 
   const handleSearch=()=>{
-    const newData=restaurantList.filter((restaurant)=> (restaurant?.info?.name.includes(searchText)))
+    const newData=masterList.filter((restaurant)=> (restaurant?.info?.name.toLowerCase().includes(searchText.toLowerCase())))
     console.log("newData",newData )
     setRestaurantList(newData)
+
   }
 
 
@@ -96,11 +99,11 @@ setRestaurantList(filteredData)
             console.log("carousel data",data?.data?.cards[0]?.card?.card?.gridElements?.infoWithStyle?.info );
             console.log("restaurant list",data?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle?.restaurants[0]);
             setRestaurantList(data?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle?.restaurants);
+            setMasterList(data?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle?.restaurants);
             }
 
           else{
             console.log("error code",response.status)
-            400,401,403,404
             if(response.status===400)
               {
                 throw new Error("Bad request, get in touch with support team")
@@ -139,6 +142,7 @@ if(errorMessage)
     </div>
   ) 
 }
+
   return (
     <>
     {/* <div>This is cardcontainer components </div> */}
@@ -154,7 +158,10 @@ if(errorMessage)
       value={searchText} 
       onChange={(e)=>handlesearchText(e.target.value)} 
       />
-       <button  onClick={handleSearch}  className='text-xl absolute right-0 top-1/2  -translate-y-1/2' >🔍</button>
+       {searchText.trim() &&<button  
+       onClick={handleSearch}  
+       className='text-xl absolute right-0 top-1/2  -translate-y-1/2' >🔍
+       </button>}
 
     </div>
 
@@ -169,14 +176,15 @@ if(errorMessage)
      
     <div className='flex gap-4 px-4 py-4 flex-wrap '>
         {
-          restaurantList.length === 0 ? (
+          restaurantList.length === 0 ? masterList.length==0?(
           <ShimmerCard/>
-         ) :(
+         ):<h1>There are no restaurant matching "<span className= 'text-red-400'>{searchText}</span>"</h1> 
+         :(
           restaurantList.map((restaurant)=>
             {
                 return <RestaurantCard
-                  {...restaurant?.info}
-                />
+                  {...restaurant?.info} key={restaurant?.info?.id}
+                />;
             })
          )}
     

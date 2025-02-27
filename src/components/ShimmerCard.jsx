@@ -1,8 +1,8 @@
 const ShimmerCard=()=>
 {
-    return new Array(20).fill(0).map((card)=>{
+    return new Array(20).fill(0).map((card,index)=>{
         return(
-            <div className='w-full shadow-md  md:max-w-[250px] max-w[300px] rounded-[15px]'>
+            <div key={index} className='w-full shadow-md  md:max-w-[250px] max-w[300px] rounded-[15px]'>
             <div className='w-full h-[150px] bg-[#f7f7f7] rounded-[15px]'>
                 <div className='w-full h-full object-cover rounded-[15px]'/>
             </div>
